@@ -1,12 +1,27 @@
+buildscript {
+  repositories { jcenter() }
+  dependencies { classpath 'com.netflix.nebula:gradle-rxjava-project-plugin:1.12.+' }
+}
+
+buildscript {
+  repositories { maven { url "http://clojars.org/repo" } }
+  dependencies { classpath "clojuresque:clojuresque:1.5.8" }
+}
+
+repositories {
+  clojarsRepo()
+}
+
+
+
+
+apply plugin: 'rxjava-project'
 apply plugin: 'clojure'
-apply plugin: 'osgi'
 
 dependencies {
-    compile project(':rxjava-core')
-
-    // clojure
+    compile 'com.netflix.rxjava:rxjava-core:0.20.2'
     compile 'org.clojure:clojure:1.4.+'
-
+    
     // this should be 'compile' for the 'examples' module
     testCompile 'clj-http:clj-http:0.6.4' // https://clojars.org/clj-http
 }
@@ -19,15 +34,6 @@ tasks.compileExamplesClojure.classpath = files(tasks.compileClojure.destinationD
 aotCompile = true
 warnOnReflection = false
 
-buildscript {
-  repositories { maven { url "http://clojars.org/repo" } }
-  dependencies { classpath "clojuresque:clojuresque:1.5.8" }
-}
-
-repositories {
-  clojarsRepo()
-}
-
 /*
  * Add Counterclockwise and include 'testCompile' dependencies
  */
@@ -39,16 +45,6 @@ eclipse {
 
 tasks.clojureTest {
     classpath = classpath + configurations.testCompile
-}
-
-jar {
-    manifest {
-        name = 'rxjava-clojure'
-        instruction 'Bundle-Vendor', 'Netflix'
-        instruction 'Bundle-DocURL', 'https://github.com/Netflix/RxJava'
-        instruction 'Import-Package', '!org.junit,!junit.framework,!org.mockito.*,*'
-        instruction 'Fragment-Host', 'com.netflix.rxjava.core'
-    }
 }
 
 
@@ -73,3 +69,4 @@ task nrepl(type: JavaExec) {
          '--eval', "(println \"Starting nrepl server on port $nreplPortValue\")",
          '--eval', "(def server (start-server :port $nreplPortValue))"
 }
+
