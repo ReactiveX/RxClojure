@@ -19,7 +19,7 @@ apply plugin: 'rxjava-project'
 apply plugin: 'clojure'
 
 dependencies {
-    compile 'com.netflix.rxjava:rxjava-core:0.20.2'
+    compile 'io.reactivex:rxjava:1.0.+'
     compile 'org.clojure:clojure:1.4.+'
     
     // this should be 'compile' for the 'examples' module
