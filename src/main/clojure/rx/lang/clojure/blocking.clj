@@ -33,7 +33,7 @@
   [o]
   (if (instance? BlockingObservable o)
     o
-    (.toBlockingObservable ^Observable o)))
+    (BlockingObservable/from ^Observable o)))
 
 (defn o->seq
   "Returns a lazy sequence of the items emitted by o
