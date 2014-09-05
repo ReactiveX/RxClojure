@@ -8,7 +8,6 @@
 (deftest test-fn*
   (testing "implements Func0-9"
     (let [f (rx/fn* vector)]
-      (is (instance? rx.Observable$OnSubscribeFunc f))
       (is (instance? rx.functions.Func0 f))
       (is (instance? rx.functions.Func1 f))
       (is (instance? rx.functions.Func2 f))
@@ -115,29 +114,20 @@
 
 (deftest test-basic-usage
 
-  (testing "can create an observable with old style fn"
-    (is (= 99
-           (-> (Observable/create (rx/fn [^rx.Observer o]
-                                    (.onNext o 99)
-                                    (.onCompleted o)
-                                    (rx.subscriptions.Subscriptions/empty)))
-               .toBlockingObservable
-               .single))))
-
   (testing "can create an observable with new-style action"
     (is (= 99
            (-> (Observable/create (rx/action [^rx.Subscriber s]
                                     (when-not (.isUnsubscribed s)
                                       (.onNext s 99))
                                     (.onCompleted s)))
-               .toBlockingObservable
+               BlockingObservable/from
                .single))))
   (testing "can pass rx/fn to map and friends"
     (is (= (+ 1 4 9)
            (-> (Observable/from [1 2 3])
                (.map (rx/fn [v] (* v v)))
                (.reduce (rx/fn* +))
-           .toBlockingObservable
+           BlockingObservable/from
            .single))))
 
   (testing "can pass rx/action to subscribe and friends"

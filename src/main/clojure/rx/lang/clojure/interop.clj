@@ -17,17 +17,8 @@
   (let [f-name (gensym "rc")]
     `(let [~f-name ~f]
        (reify
-         ; If they want Func1, give them onSubscribe as well so Observable/create can be
-         ; used seemlessly with rx/fn.
-         ; TODO remove this when OnSubscriberFunc is removed
-         ~@(if (and (= prefix "rx.functions.Func")
-                    (some #{1} arities))
-             `(rx.Observable$OnSubscribeFunc
-                (~'onSubscribe [~'this observer#]
-                  (~f-name observer#))))
-
          ; OnSubscribe is just an Action1, so add it to the list of implemented interfaces
-         ; so an action cab be used with Observable/create
+         ; so an action can be used with Observable/create
          ~@(if (and (= prefix "rx.functions.Action")
                     (some #{1} arities))
              `(rx.Observable$OnSubscribe))
