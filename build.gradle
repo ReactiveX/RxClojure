@@ -15,7 +15,7 @@ clojure {
 }
 
 dependencies {
-    compile 'io.reactivex:rxjava:1.0.+'
+    compile 'com.netflix.rxjava:rxjava-core:0.20.+'
     compile 'org.clojure:clojure:1.5.+'
     
     examplesCompile 'clj-http:clj-http:0.6.4' // https://clojars.org/clj-http
