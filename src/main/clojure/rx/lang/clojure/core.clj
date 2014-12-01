@@ -381,10 +381,10 @@
   "Returns an Observable that emits the number of items is xs as a long.
 
   See:
-    rx.Observable/longCount
+    rx.Observable/countLong
   "
   [^Observable xs]
-  (.longCount xs))
+  (.countLong xs))
 
 (defn cycle
   "Returns an Observable that emits the items of xs repeatedly, forever.
