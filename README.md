@@ -7,21 +7,21 @@ Binaries and dependency information for Maven, Ivy, Gradle and others can be fou
 Example for Leiningen:
 
 ```clojure
-[com.netflix.rxjava/rxjava-clojure "x.y.z"]
+[io.reactivex/rxclojure "x.y.z"]
 ```
 
 and for Gradle:
 
 ```groovy
-compile 'com.netflix.rxjava:rxjava-clojure:x.y.z'
+compile 'io.reactivex:rxclojure:x.y.z'
 ```
 
 and for Maven:
 
 ```xml
 <dependency>
-    <groupId>com.netflix.rxjava</groupId>
-    <artifactId>rxjava-clojure</artifactId>
+    <groupId>io.reactivex</groupId>
+    <artifactId>rxclojure</artifactId>
     <version>x.y.z</version>
 </dependency>
 ```
@@ -29,7 +29,7 @@ and for Maven:
 and for Ivy:
 
 ```xml
-<dependency org="com.netflix.rxjava" name="rxjava-clojure" rev="x.y.z" />
+<dependency org="io.reactivex" name="rxclojure" rev="x.y.z" />
 ```
 
 # Clojure Bindings
