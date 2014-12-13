@@ -1,7 +1,7 @@
 buildscript {
   repositories { jcenter() }
   repositories { maven { url 'http://clojars.org/repo' } }
-  dependencies { classpath 'com.netflix.nebula:gradle-rxjava-project-plugin:1.12.+' }
+  dependencies { classpath 'com.netflix.nebula:gradle-rxjava-project-plugin:2.+' }
   repositories { maven { url 'http://dl.bintray.com/nebula/gradle-plugins' } } // Unlink nebula-clojure is linked to jcenter
   dependencies { classpath 'com.netflix.nebula:nebula-clojure-plugin:1.12.+' }
 }
