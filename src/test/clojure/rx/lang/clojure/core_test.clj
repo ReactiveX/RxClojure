@@ -2,7 +2,8 @@
   (:require [rx.lang.clojure.core :as rx]
             [rx.lang.clojure.blocking :as b]
             [rx.lang.clojure.future :as f]
-            [clojure.test :refer [deftest is testing are]]))
+            [clojure.test :refer [deftest is testing are]])
+  (:import java.util.concurrent.TimeUnit))
 
 (deftest test-observable?
   (is (rx/observable? (rx/return 99)))
@@ -164,6 +165,31 @@
   (is (= [0 1 2 3] (b/first (rx/into [] (rx/seq->o (range 4))))))
   (is (= #{0 1 2 3} (b/first (rx/into #{} (rx/seq->o (range 4))))))
   (is (= {:a 1 :b 2 :c 3} (b/first (rx/into {} (rx/seq->o [[:a 1] [:b 2] [:c 3]]))))))
+
+(let [sched (rx/scheduler :test)]
+  (let [vals  (atom [])
+        completed (atom false)
+        obs   (->> (rx/interval 1 :s sched)
+                (rx/take 2))]
+    (rx/subscribe obs (fn [v] (swap! vals conj v)) (fn [e]) (fn [] (swap! completed not)))
+    (deftest test-interval
+      (.advanceTimeBy sched 1 TimeUnit/SECONDS)
+      (.triggerActions sched)
+      (= [1] @vals)
+      (= false @completed)
+      (.advanceTimeBy sched 1 TimeUnit/SECONDS)
+      (.triggerActions sched)
+      (= [1 2] @vals)
+      (= true @completed)))
+  (let [val (atom nil)
+        completed (atom false)
+        obs (rx/timer 1 :s sched)]
+    (rx/subscribe obs (fn [v] (compare-and-set! val nil v)) (fn [e]) (fn [] (swap! completed not)))
+    (deftest test-timer
+      (.advanceTimeBy sched 1 TimeUnit/SECONDS)
+      (.triggerActions sched)
+      (= 0 @val)
+      (= true @completed))))
 
 (deftest test-return
   (is (= [0] (b/into [] (rx/return 0)))))

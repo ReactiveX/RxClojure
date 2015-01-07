@@ -11,6 +11,7 @@
                             range reduce reductions
                             rest seq some sort sort-by split-with
                             take take-while throw])
+  (:import java.util.concurrent.TimeUnit)
   (:require [rx.lang.clojure.interop :as iop]
             [rx.lang.clojure.graph :as graph]
             [rx.lang.clojure.realized :as realized])
@@ -22,6 +23,7 @@
             BlockingObservable
             GroupedObservable]
            [rx.subscriptions Subscriptions]
+           [rx.schedulers Schedulers]
            [rx.functions Action0 Action1 Func0 Func1 Func2]))
 
 (set! *warn-on-reflection* true)
@@ -190,6 +192,25 @@
 
 ;################################################################################
 
+(defn ^rx.Scheduler scheduler
+  "Retrieve a scheduler instance for use with subscribe-on and observe-on on via keywords.
+
+   Available schedulers are
+    :immediate Schedulers/immediate
+    :trampoline Schedulers/trampoline
+    :thread Schedulers/newThread
+    :comp Schedulers/computation
+    :io Schedulers/io
+    :test Schedulers/test "
+  [sched]
+  (cond (= sched :immediate) (Schedulers/immediate)
+        (= sched :trampoline) (Schedulers/trampoline)
+        (= sched :thread) (Schedulers/newThread)
+        (= sched :comp) (Schedulers/computation)
+        (= sched :io) (Schedulers/io)
+        (= sched :test) (Schedulers/test)
+        :default (throw (IllegalArgumentException. (str "Unrecognized scheduler: " sched)))))
+
 (defn ^Subscription subscribe
   "Subscribe to the given observable.
 
@@ -252,6 +273,15 @@
   [^Subscription s]
   (.isUnsubscribed s))
 
+(defn observe-on
+  "Observe values on the given scheduler
+
+  See:
+    rx.Observable/subscribeOn
+  "
+  [^rx.Scheduler s ^Observable xs]
+  (.observeOn xs s))
+
 ;################################################################################
 ; Functions for creating Observables
 
@@ -288,6 +318,38 @@
   (if-let [s (clojure.core/seq xs)]
     (Observable/from ^Iterable s)
     (empty)))
+
+(def time-units
+  {:days TimeUnit/DAYS
+   :hours TimeUnit/HOURS
+   :microseconds TimeUnit/MICROSECONDS
+   :milliseconds TimeUnit/MILLISECONDS
+   :minutes TimeUnit/MINUTES
+   :nanoseconds TimeUnit/NANOSECONDS
+   :seconds TimeUnit/SECONDS
+   ; Convenience
+   :s TimeUnit/SECONDS
+   :ms TimeUnit/MILLISECONDS
+   :ns TimeUnit/NANOSECONDS
+   :us TimeUnit/MICROSECONDS})
+
+(defn ^Observable interval
+  "Make an observable that emits a value periodically."
+  ([^Long interval unit] 
+    (assert (contains? time-units unit) "unknown time unit")
+    (Observable/interval interval (time-units unit)))
+  ([^Long interval unit ^rx.Scheduler scheduler] 
+    (assert (contains? time-units unit) "unknown time unit")
+    (Observable/interval interval (time-units unit) scheduler)))
+
+(defn ^Observable timer
+  "Returns an Observable that emits one item after a specified delay, and then completes."
+  ([^Long delay unit] 
+    (assert (contains? time-units unit) "unknown time unit")
+    (Observable/timer delay (time-units unit)))
+  ([^Long delay unit ^rx.Scheduler scheduler]
+    (assert (contains? time-units unit) "unknown time unit")
+    (Observable/timer delay (time-units unit) scheduler)))
 
 ;################################################################################
 ; Operators
