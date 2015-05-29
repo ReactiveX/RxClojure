@@ -22,7 +22,8 @@
             BlockingObservable
             GroupedObservable]
            [rx.subscriptions Subscriptions]
-           [rx.functions Action0 Action1 Func0 Func1 Func2]))
+           [rx.functions Action0 Action1 Func0 Func1 Func2]
+           [java.util.concurrent TimeUnit]))
 
 (set! *warn-on-reflection* true)
 
@@ -288,6 +289,26 @@
   (if-let [s (clojure.core/seq xs)]
     (Observable/from ^Iterable s)
     (empty)))
+
+(defn ^Observable interval
+  "Make an observable from time intervals by specifying a time and unit of measurement.
+  The default unit of measurement is milliseconds.
+  
+  See:
+    rx.Observable/interval
+  "
+  ([ms] (interval ms :ms))
+  ([amount unit]
+   (let [junit (condp #(%1 %2) unit
+                 #{:ns :nanoseconds}  TimeUnit/MILLISECONDS
+                 #{:us :microseconds} TimeUnit/MILLISECONDS
+                 #{:ms :milliseconds} TimeUnit/MILLISECONDS
+                 #{:s :sec :seconds}  TimeUnit/SECONDS
+                 #{:min :minutes}     TimeUnit/MINUTES
+                 #{:hr :hours}        TimeUnit/HOURS
+                 #{:days}             TimeUnit/DAYS
+                 TimeUnit/MILLISECONDS)]
+     (Observable/interval amount junit))))
 
 ;################################################################################
 ; Operators
